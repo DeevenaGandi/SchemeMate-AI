@@ -1,1 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchemeMate AI</title>
 
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f7fb;
+    color:#172033
+}
+
+header{
+    background:#173b73;
+    color:#fff;
+    padding:20px 7%;
+    display:flex;
+    justify-content:space-between
+}
+
+main{
+    max-width:1050px;
+    margin:20px auto;
+    padding:0 15px
+}
+
+.hero,.card{
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 8px 30px #173b7310;
+    margin-bottom:20px
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px
+}
+
+label{
+    display:block;
+    font-weight:600;
+    margin:10px 0 5px
+}
+
+input,select,textarea{
+    width:100%;
+    padding:11px;
+    border:1px solid #ccd5e3;
+    border-radius:9px;
+    font-size:14px
+}
+
+button{
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    background:#173b73;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:12px
+}
+
+.result{
+    display:none
+}
+
+.match{
+    border:1px solid #dbe4f1;
+    border-radius:12px;
+    padding:14px;
+    margin:10px 0
+}
+
+.match:hover{
+    border-color:#173b73;
+    background:#f8faff
+}
+
+.score{
+    float:right;
+    background:#e7f7ee;
+    color:#08733e;
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold
+}
+
+.pill{
+    display:inline-block;
+    padding:4px 8px;
+    background:#eef3fa;
+    border-radius:20px;
+    font-size:11px;
+    margin:2px
+}
+
+.docs{
+    margin-top:8px;
+    background:#fff8e6;
+    border:1px dashed #f0c36d;
+    border-radius:8px;
+    padding:8px;
+    font-size:13px
+}
+
+.official{
+    display:inline-block;
+    margin-top:8px;
+    padding:8px 12px;
+    background:#173b73;
+    color:white;
+    text-decoration:none;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:bold
+}
+
+.official:hover{
+    opacity:0.9
+}
+
+@media(max-width:750px){
+    .grid{
+        grid-template-columns:1fr
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div>
+    <b>🤖 SchemeMate AI</b>
+</div>
+
+<div>
+    Hackathon
+</div>
+
+</header>
+
+
+<main>
+
+<div class="hero">
+
+<h1>
+    Find support for your business
+</h1>
+
+<p>
+    AI matching + required documents + official scheme information for marginalized entrepreneurs.
+</p>
+
+</div>
+
+
+<div class="grid">
+
+
+<!-- ENTREPRENEUR PROFILE -->
+
+<div class="card">
+
+<h2>
+    👤 Entrepreneur Profile
+</h2>
+
+
+<label>
+    Social Category
+</label>
+
+<select id="category">
+
+    <option>SC</option>
+    <option>ST</option>
+    <option>OBC</option>
+    <option>Other</option>
+
+</select>
+
+
+<label>
+    Annual Income ₹
+</label>
+
+<input
+    id="income"
+    type="number"
+    value="300000"
+>
+
+
+<label>
+    Project Amount ₹
+</label>
+
+<input
+    id="project"
+    type="number"
+    value="100000"
+>
+
+
+<label>
+    Purpose
+</label>
+
+<select id="purpose">
+
+    <option value="micro">
+        Small business
+    </option>
+
+    <option value="term">
+        Expansion
+    </option>
+
+    <option value="education">
+        Education
+    </option>
+
+</select>
+
+
+<label>
+    State
+</label>
+
+<select id="state">
+
+    <option>
+        Andhra Pradesh
+    </option>
+
+    <option>
+        Telangana
+    </option>
+
+    <option>
+        Karnataka
+    </option>
+
+</select>
+
+
+<button onclick="doMatch()">
+
+    ✨ Find My Best Schemes
+
+</button>
+
+</div>
+
+
+<!-- RESULTS -->
+
+<div
+    class="card result"
+    id="result"
+>
+
+<h2>
+    🎯 AI Matching Results
+</h2>
+
+<div id="matches"></div>
+
+</div>
+
+</div>
+
+</main>
+
+
+<script>
+
+/* -----------------------------
+   SCHEME DATABASE
+----------------------------- */
+
+const schemes = [
+
+    {
+        name:"PM MUDRA Yojana",
+
+        purpose:["micro","term"],
+
+        categories:["SC","ST","OBC","Other"],
+
+        max:1000000,
+
+        base:72,
+
+        reason:
+        "Designed for marginalized micro entrepreneurs with SC/ST concession.",
+
+        docs:[
+            "Aadhaar Card",
+            "PAN Card",
+            "Business Proof",
+            "Bank Statement 6 months",
+            "Income Certificate",
+            "Caste Certificate",
+            "Photos"
+        ],
+
+        official:
+        "https://www.mudra.org.in/"
+    },
+
+
+    {
+        name:"Stand-Up India",
+
+        purpose:["term","micro"],
+
+        categories:["SC","ST"],
+
+        max:10000000,
+
+        base:78,
+
+        reason:
+        "Only for SC/ST and Women. Loan 10L to 1Cr for Greenfield projects.",
+
+        docs:[
+            "SC/ST Caste Certificate",
+            "Aadhaar Card",
+            "Business Plan",
+            "PAN Card",
+            "Residence Proof",
+            "Bank Details"
+        ],
+
+        official:
+        "https://www.standupmitra.in/"
+    },
+
+
+    {
+        name:"PMEGP",
+
+        purpose:["micro","term"],
+
+        categories:["SC","ST","OBC","Other"],
+
+        max:2500000,
+
+        base:65,
+
+        reason:
+        "35% subsidy for SC/ST/Women in rural areas, 25% in urban.",
+
+        docs:[
+            "Aadhaar Card",
+            "Caste Certificate",
+            "8th Pass Certificate",
+            "Project Report",
+            "Village Registration"
+        ],
+
+        official:
+        "https://www.kviconline.gov.in/pmegpeportal/"
+    },
+
+
+    {
+        name:"NSFDC - SC Entrepreneurs",
+
+        purpose:["micro","term"],
+
+        categories:["SC"],
+
+        max:5000000,
+
+        base:85,
+
+        reason:
+        "National SC Finance Corp - concessional financial assistance for eligible SC beneficiaries.",
+
+        docs:[
+            "SC Caste Certificate",
+            "Aadhaar & PAN",
+            "Income Certificate",
+            "BPL Card",
+            "Business Plan"
+        ],
+
+        official:
+        "https://nsfdc.nic.in/"
+    },
+
+
+    {
+        name:"Education Loan Support",
+
+        purpose:["education"],
+
+        categories:["SC","ST","OBC","Other"],
+
+        max:2000000,
+
+        base:60,
+
+        reason:
+        "Education-focused financial support may be relevant when the stated purpose is education.",
+
+        docs:[
+            "Student Aadhaar",
+            "Caste & Income Certificate",
+            "Admission Letter",
+            "Fee Structure",
+            "Mark sheets"
+        ],
+
+        official:
+        "https://www.myscheme.gov.in/"
+    }
+
+];
+
+
+/* -----------------------------
+   MATCHING ENGINE
+----------------------------- */
+
+function doMatch(){
+
+    const cat =
+        document.getElementById("category").value;
+
+    const pur =
+        document.getElementById("purpose").value;
+
+    const proj =
+        Number(
+            document.getElementById("project").value
+        ) || 0;
+
+    const inc =
+        Number(
+            document.getElementById("income").value
+        ) || 0;
+
+
+    let ranked =
+        schemes.map(s => {
+
+            let score = s.base;
+
+
+            /* Purpose */
+
+            if(
+                s.purpose.includes(pur)
+            ){
+
+                score += 15;
+
+            }
+
+            else{
+
+                score -= 25;
+
+            }
+
+
+            /* Category */
+
+            if(
+                s.categories.includes(cat)
+            ){
+
+                score += 10;
+
+            }
+
+
+            /* Project amount */
+
+            if(
+                proj > 0 &&
+                proj <= s.max
+            ){
+
+                score += 5;
+
+            }
+
+
+            /* Income */
+
+            if(
+                inc <= 300000
+            ){
+
+                score += 3;
+
+            }
+
+
+            /* Keep score between 0 and 99 */
+
+            score =
+                Math.max(
+                    0,
+                    Math.min(99,score)
+                );
+
+
+            return {
+                ...s,
+                score:score
+            };
+
+        });
+
+
+    /* Sort */
+
+    ranked.sort(
+        (a,b) =>
+        b.score - a.score
+    );
+
+
+    /* Display top 3 */
+
+    const html =
+
+        ranked
+        .slice(0,3)
+        .map(s => {
+
+            return `
+
+            <div class="match">
+
+                <span class="score">
+
+                    ${s.score}% match
+
+                </span>
+
+
+                <h3>
+
+                    ${s.name}
+
+                </h3>
+
+
+                <div>
+
+                    ${s.categories
+                        .map(c =>
+                            `<span class="pill">
+                                ${c}
+                            </span>`
+                        )
+                        .join("")
+                    }
+
+                </div>
+
+
+                <p
+                    style="
+                    font-size:13px;
+                    color:#536175
+                    "
+                >
+
+                    <b>Why?</b>
+                    ${s.reason}
+
+                </p>
+
+
+                <div class="docs">
+
+                    <b>
+                        📄 Required:
+                    </b>
+
+                    ${s.docs.join(", ")}
+
+                </div>
+
+
+                <a
+                    class="official"
+                    href="${s.official}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+
+                    🌐 Official Website
+
+                </a>
+
+            </div>
+
+            `;
+
+        })
+        .join("");
+
+
+    document.getElementById("matches")
+        .innerHTML = html;
+
+
+    document.getElementById("result")
+        .style.display = "block";
+
+}
+
+</script>
+
+</body>
+</html>
